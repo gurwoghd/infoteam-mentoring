@@ -8,12 +8,14 @@ import {
   HttpException,
   HttpStatus,
   Patch,
+  Logger,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
+  private logger = new Logger(UserController.name);
   constructor(private readonly userService: UserService) {}
 
   @Post()
@@ -24,8 +26,8 @@ export class UserController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<UserDto> {
     const result: UserDto = await this.userService.findOne(parseInt(id));
-    // console.log(result);
-    if (result === null)
+    if (result === null) {
+      this.logger.error(`There is no user with id=${id}, {/user/:id, GET}`);
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
@@ -33,6 +35,7 @@ export class UserController {
         },
         HttpStatus.BAD_REQUEST,
       );
+    }
     return result;
   }
 
@@ -47,7 +50,8 @@ export class UserController {
     @Body() body: UserDto,
   ): Promise<UserDto | null> {
     const result: UserDto = await this.userService.findOne(parseInt(id));
-    if (result === null)
+    if (result === null) {
+      this.logger.error(`There is no user with id=${id}, {/user/:id, PATCH}`);
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
@@ -55,6 +59,7 @@ export class UserController {
         },
         HttpStatus.BAD_REQUEST,
       );
+    }
     return this.userService.update(parseInt(id), body);
   }
 
@@ -62,6 +67,7 @@ export class UserController {
   async delete(@Param('id') id: string): Promise<UserDto> {
     const result: UserDto = await this.userService.findOne(parseInt(id));
     if (result === null) {
+      this.logger.error(`There is no user with id=${id}, {/user/:id, DELETE}`);
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
