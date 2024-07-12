@@ -48,7 +48,7 @@ export class UserController {
   async update(
     @Param('id') id: string,
     @Body() body: UserDto,
-  ): Promise<UserDto | null> {
+  ): Promise<UserDto> {
     const result: UserDto = await this.userService.findOne(parseInt(id));
     if (result === null) {
       this.logger.error(`There is no user with id=${id}, {/user/:id, PATCH}`);
