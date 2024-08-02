@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 import { Test } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('UserController', () => {
   let userController: UserController;
@@ -55,9 +56,11 @@ describe('UserController', () => {
     });
   });
 
-  //   describe('findOne', () => {
-  //     it('should the specific user info from user database', async () => {
-  //       const result: Promise<UserDto> = new Promise(re);
-  //     });
-  //   });
+  describe('findOne', () => {
+    it('should the specific user info from user database', async () => {
+      await expect(userController.findOne('1')).rejects.toThrow(
+        new NotFoundException(),
+      );
+    });
+  });
 });
